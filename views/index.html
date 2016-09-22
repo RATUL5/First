@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html ng-app='movieFan'>
+<head>
+	<title>MovieFan</title>
+	<style type="text/css">
+		
+		.bg-1 h3 {
+			color: #777;
+			letter-spacing: 3px;
+
+		}
+		.bg-2 .thumbnail{
+           padding: 0 15px 0 0;
+
+		}
+		.bg-2 .btn{
+			background-color: #4D4Dff;
+			border: none;
+			padding: 8px 16px;
+            color: #E1E1E1;
+		}
+		.bg-2 .btn:hover{
+			background-color: white;
+			border: 1px solid #4D4Dff;
+			color: #4D4Dff;
+		}
+	</style>
+</head>
+<body>
+    <nav class="navbar navbar-inverse">
+    	<div class="container-fluid">
+    		<div class="navbar-header">
+    			<a ui-sref='movieList' class="navbar-brand">Movies</a>
+    		</div>
+    	</div>
+    </nav>
+   
+    <ui-view></ui-view>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular.min.js"></script>
+    
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.10/angular-ui-router.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular-resource.min.js"></script>
+
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+
+    <script type="text/ng-template" id="/movieList.html">
+    	<div class="col-md-6 col-md-offset-3 bg-1">
+    		<div ng-repeat='movie in movieList' class="bg-2">  		   
+	    		    <div class="row">
+	    		    	<div class="col-md-4 thumbnail">
+	    		    		<img src="{{movie.poster}}" width="70%" height="100">
+	    		    		
+	    		    	</div>
+	    		    	<div class="col-md-8">
+	    		    		<h3>{{movie.title}}</h3>
+	    		    		<hr style="color:#3333ff">
+	    		    		<h5>Director: {{movie.director}}</h5>
+	    		    		<h5>IMDB Rating:{{movie.imdb.rating}}</h5>
+	    		    		<a ui-sref='movieView({id:movie._id})' class="btn btn-default">DETAILS </a>
+	    		    	</div>
+	    		    </div>
+    		         
+    		        <hr style="color:blue;">
+    	    </div>
+    	</div>
+    </script>
+
+    <script type="text/ng-template" id="/movieView.html">
+    	<h4>{{movie.title}}</h4>
+    </script>
+
+    <script>
+    	angular.module('movieFan',['ui.router','ngResource'])
+    	   .factory('Movies',function($resource){
+    	   	  return $resource('/api/:id',null);
+    	   })
+
+    	   .config(function($stateProvider,$urlRouterProvider){
+    	   	  $stateProvider
+    	   	     .state('movieList',{
+    	   	     	 url:'/api',
+    	   	     	 templateUrl:'/movieList.html',
+    	   	     	 controller:'movieListCtrl'
+    	   	     })
+    	   	     .state('movieView',{
+    	   	     	 url:'/api/:id',
+    	   	     	 templateUrl:'/movieView.html',
+    	   	     	 controller:'movieViewCtrl'
+    	   	     });
+    	   	   //  .state('tops',{
+    	   	     //	url:'/top10',
+    	   	     //	templateUrl:'/movieList.html',
+    	   	     //	controller:'top10Ctrl'
+    	   	    // });
+
+              $urlRouterProvider.otherwise('/api');
+    	   })
+
+    	   .controller('movieListCtrl',['Movies','$scope',function(Movies,$scope){
+    	   	   $scope.movieList=Movies.query();
+    	   }])
+
+    	   .controller('movieViewCtrl',['Movies','$scope','$stateParams',function(Movies,$scope,$stateParams){
+    	   	   $scope.movie=Movies.get({id:$stateParams.id});
+    	   }]);
+
+    	  // .controller('top10Ctrl',['Movies','$scope','$stateParams',function(Movies,$scope,$stateParams){
+    	   //	   $scope.movies=Movies.query();
+    	   //}])
+    	   
+    </script>
+</body>
+</html>
